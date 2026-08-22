@@ -1,0 +1,43 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install release tools
+        run: python -m pip install --upgrade build twine
+
+      - name: Download and verify pinned model
+        run: python scripts/download_model.py --destination model
+
+      - name: Build distributions
+        run: |
+          python scripts/build_weights_wheel.py --model model/gemma-4-E2B-it.litertlm --version 0.1.0 --out dist/weights
+          python -m build --wheel --sdist --outdir dist/runtime
+          python scripts/verify_wheel.py dist/weights/gemma4_e2b_text_weights-0.1.0-py3-none-any.whl
+          python -m twine check dist/weights/* dist/runtime/*
+
+      - name: Publish weights first
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/weights/
+
+      - name: Publish wrapper
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/runtime/

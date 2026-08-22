@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run unit tests
+        run: PYTHONPATH=src python -m unittest discover -s tests -v
+
+      - name: Build runtime wheel
+        run: python -m pip wheel . --no-deps --no-build-isolation -w dist/runtime
+
+      - name: Build and verify placeholder weights wheel
+        run: |
+          python scripts/build_weights_wheel.py --placeholder --version 0.1.0.dev0 --out dist/weights
+          python scripts/verify_wheel.py dist/weights/gemma4_e2b_text_weights-0.1.0.dev0-py3-none-any.whl

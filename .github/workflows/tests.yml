@@ -20,6 +20,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install build tools
+        run: python -m pip install --upgrade "setuptools>=77" wheel
+
       - name: Run unit tests
         run: PYTHONPATH=src python -m unittest discover -s tests -v
 

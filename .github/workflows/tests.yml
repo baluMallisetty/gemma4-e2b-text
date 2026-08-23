@@ -28,8 +28,3 @@ jobs:
 
       - name: Build runtime wheel
         run: python -m pip wheel . --no-deps --no-build-isolation -w dist/runtime
-
-      - name: Build and verify placeholder weights wheel
-        run: |
-          python scripts/build_weights_wheel.py --placeholder --version 0.1.0.dev0 --out dist/weights
-          python scripts/verify_wheel.py dist/weights/gemma4_e2b_text_weights-0.1.0.dev0-py3-none-any.whl

@@ -1,0 +1,43 @@
+name: Publish model assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-model-v0.1.0
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download and verify official model
+        run: python scripts/download_model.py --destination model
+
+      - name: Prepare two GitHub Release assets
+        run: |
+          python scripts/split_model.py \
+            --model model/gemma-4-E2B-it.litertlm \
+            --output release-assets
+
+      - name: Create or update model release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view model-v0.1.0 >/dev/null 2>&1; then
+            gh release upload model-v0.1.0 release-assets/* --clobber
+          else
+            gh release create model-v0.1.0 release-assets/* \
+              --title "Gemma 4 E2B model assets v0.1.0" \
+              --notes-file MODEL_RELEASE_NOTES.md
+          fi
+

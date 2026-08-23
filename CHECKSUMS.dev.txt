@@ -1,0 +1,3 @@
+# Locally verified development artifacts (model payload intentionally absent)
+ba29b55325633c3d9aec1500124614f8cbedc109cb915b201da227f7869ce576  dist/runtime/gemma4_e2b_text-0.1.0-py3-none-any.whl
+817d75e7e845a103c83817d7d59c47519d6e4dd4b549a3f865fedf98a614e62b  dist/weights/gemma4_e2b_text_weights-0.1.0.dev0-py3-none-any.whl

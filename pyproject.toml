@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gemma4-e2b-text"
+version = "0.1.0"
+description = "One-command local text inference with Gemma 4 E2B and LiteRT-LM"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [{name = "Balu Mallisetty"}]
+keywords = ["gemma", "llm", "local-ai", "litert", "on-device"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "gemma4-e2b-text-weights==0.1.0",
+  "litert-lm-api>=0.16.1,<0.17",
+]
+
+[project.urls]
+Homepage = "https://github.com/baluMallisetty/gemma4-e2b-text"
+Issues = "https://github.com/baluMallisetty/gemma4-e2b-text/issues"
+Source = "https://github.com/baluMallisetty/gemma4-e2b-text"
+
+[project.scripts]
+gemma4-e2b = "gemma4_e2b_text.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

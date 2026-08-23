@@ -8,25 +8,16 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
+from .download import download_model
+
 
 MODEL_ENVIRONMENT_VARIABLE = "GEMMA4_E2B_MODEL"
 
 
-def _bundled_model_path() -> Path:
-    try:
-        from gemma4_e2b_text_weights import model_path
-    except ImportError as exc:
-        raise RuntimeError(
-            "The bundled weights package is missing. Reinstall with "
-            "`python -m pip install --force-reinstall gemma4-e2b-text`."
-        ) from exc
-    return Path(model_path())
-
-
 def resolve_model_path(model_path: str | os.PathLike[str] | None = None) -> Path:
-    """Resolve an explicit, environment-provided, or bundled model path."""
+    """Resolve an explicit/environment path or download the release model."""
     candidate = model_path or os.environ.get(MODEL_ENVIRONMENT_VARIABLE)
-    path = Path(candidate).expanduser() if candidate else _bundled_model_path()
+    path = Path(candidate).expanduser() if candidate else download_model()
     if not path.is_file():
         raise FileNotFoundError(f"Gemma 4 model file not found: {path}")
     if path.suffix.lower() != ".litertlm":
@@ -95,7 +86,9 @@ class Conversation:
 class Gemma4:
     """Context-managed local Gemma 4 E2B engine.
 
-    The public interface accepts text only. The official LiteRT-LM bundle may
+    On first use, the model is downloaded from this project's GitHub Release,
+    verified, and cached for offline reuse. The public interface accepts text
+    only. The official LiteRT-LM bundle may
     contain optional multimodal components, but no vision or audio backend is
     initialized here.
     """
@@ -179,4 +172,3 @@ def generate(
     """Convenience function for one local generation."""
     with Gemma4(model_path=model_path, backend=backend) as model:
         return model.generate(prompt, system=system)
-
